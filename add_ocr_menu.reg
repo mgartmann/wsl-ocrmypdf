@@ -1,0 +1,9 @@
+Windows Registry Editor Version 5.00
+
+; This covers both files and folders more reliably
+[HKEY_CLASSES_ROOT\AllFilesystemObjects\shell\PdfOcr]
+@="Do OCR with WSL"
+"Icon"="powershell.exe"
+
+[HKEY_CLASSES_ROOT\AllFilesystemObjects\shell\PdfOcr\command]
+@="\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -NoProfile -ExecutionPolicy Bypass -File \"<your-path-to-script>\\wsl-ocr-context-menu.ps1\" \"%1\""

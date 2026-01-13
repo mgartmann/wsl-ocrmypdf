@@ -6,6 +6,8 @@ It does OCR on *all* PDF files found in a given path and saves the OCRd files as
 **Note that this script is far from being polished or "production ready".**
 I was simply tired of entering these commands manually every time I wanted to OCR my PDFs.
 
+Also, I let AI produce a lot of the code for me - so use with caution.
+
 ## Prerequisites
 
 - installed WSL with a configured default distribution
@@ -16,6 +18,8 @@ I was simply tired of entering these commands manually every time I wanted to OC
 
 - either simply download and run the `exe` file
 - or run using PowerShell: `.\wsl-ocr.ps1`
+
+I created a second script [wsl-ocr-context-menu.ps1](wsl-ocr-context-menu.ps1) which works in Window's context menu on single and multiple selected files as well as folders. To add the script to the context menu, you have to add the correct entries to Windows Registry (see [example](add_ocr_menu.reg)).
 
 ## Build
 
