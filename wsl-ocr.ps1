@@ -1,4 +1,6 @@
-﻿$driveLetter = Read-Host "Which drive do you want to mount? (E.g., 'd')"
+﻿$winPath = Read-Host "Paste the Windows path (e.g., D:\some\folder)"
+$winPath = $winPath.Trim('"').Trim()
+$driveLetter = $winPath[0].ToString().ToLower()
 
 $wslMountPoint = "/mnt/$(($driveLetter).ToLower())"
 
@@ -7,19 +9,21 @@ $wslMountPoint = "/mnt/$(($driveLetter).ToLower())"
 # The `id -u $USER` and `id -g $USER` will be executed within WSL.
 $mountCommand = "sudo mount -t drvfs ${driveLetter}: $wslMountPoint -o uid=`$(id -u $USER),gid=`$(id -g $USER),metadata"
 
-
 wsl bash -c $mountCommand
 
-Write-Host "Drive mounted in WSL"
-$dir = Read-Host "Enter the directory path for which PDFs should be converted"
-$path = "$wslMountPoint/$dir"
+$relativePath = $winPath.Substring(3).Replace('\', '/')
+
+$path = "$wslMountPoint/$relativePath"
 
 $lsOutput = wsl bash -c "ls -1F $path"
+
+Write-Host $lsOutput
 
 $parsedFiles = @() # Initialize an empty array to store parsed objects
 
 foreach ($line in $lsOutput) {
     $line = $line.Trim() # Remove any leading/trailing whitespace
+
 
     if ([string]::IsNullOrWhiteSpace($line)) {
         continue # Skip empty lines
@@ -42,7 +46,7 @@ foreach ($line in $lsOutput) {
 $pdfFiles = $parsedFiles | Where-Object { $_.IsPdf}
 
 Write-Host "`n---- Found .pdf Files ----"
-if ($pdfFiles.Count -gt 0) {
+if ($pdfFiles) {
     $pdfFiles | Format-Table -AutoSize
 } else {
     Read-Host "No .pdf files found. Press any key to exit"
@@ -52,7 +56,7 @@ Write-Host "---------------------------"
 
 foreach ($pdf in $pdfFiles) {
     Write-Host "Doing OCR for $($pdf.Name)"
-    wsl bash -c "cd $path && ocrmypdf -l deu --deskew --clean-final --output-type pdfa $($pdf.Name) OCR_$($pdf.Name)"
+    wsl bash -c "cd $path && ocrmypdf -q -l deu --deskew --clean-final --output-type pdfa $($pdf.Name) OCR_$($pdf.Name)"
 }
 
 Read-Host "All .pdf files OCR'd. Press any key to exit"
